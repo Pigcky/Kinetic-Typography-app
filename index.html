@@ -1,0 +1,2164 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kinetic Editor — 203 Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Pretendard -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<!-- Google Fonts: Noto Sans KR / IBM Plex Sans KR / Anton / Black Han Sans / Do Hyeon -->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700;900&family=Noto+Sans+KR:wght@300;400;500;700;900&family=Noto+Sans+SC:wght@400;700;900&family=Noto+Sans+JP:wght@400;700;900&family=IBM+Plex+Sans+KR:wght@400;500;700&family=Anton&family=Black+Han+Sans&family=Do+Hyeon&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+:root {
+  --bg: #0d1f30;
+  --panel: #091825;
+  --header: #070f18;
+  --text: #EEF8FA;
+  --accent: #7FCEDC;
+  --border: #1a3045;
+  --border-hi: #2a4a65;
+  --muted: #6b8499;
+  --hover: #112a3f;
+  --danger: #ff6b6b;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  font-family: 'Pretendard Variable', 'Pretendard', 'Noto Sans KR', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  height: 100vh;
+  overflow: hidden;
+  font-size: 13px;
+  -webkit-font-smoothing: antialiased;
+}
+body { display: flex; flex-direction: column; }
+
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+/* ===== Top bar ===== */
+.topbar {
+  height: 48px;
+  background: var(--header);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.topbar h1 {
+  font-size: 14px;
+  font-weight: 900;
+  color: var(--accent);
+  letter-spacing: -0.01em;
+}
+.topbar .badge {
+  font-size: 10px;
+  color: var(--muted);
+  padding: 2px 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  letter-spacing: 0.04em;
+}
+.topbar .spacer { flex: 1; }
+.topbar button {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.topbar button:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--hover);
+}
+.topbar button.primary {
+  background: var(--accent);
+  color: #0a1a25;
+  border-color: var(--accent);
+  font-weight: 700;
+}
+.topbar button.primary:hover { filter: brightness(1.1); }
+.topbar button.danger {
+  background: var(--danger);
+  color: #fff;
+  border-color: var(--danger);
+  font-weight: 700;
+}
+.topbar button.danger:hover { filter: brightness(1.1); }
+.topbar button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  filter: none !important;
+}
+
+/* ===== Main 3-column layout ===== */
+.main { flex: 1; display: flex; min-height: 0; }
+
+/* Slides panel */
+.slides-panel {
+  width: 150px;
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+.panel-title {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  padding: 16px 16px 8px;
+}
+.slides-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 8px;
+}
+.slide-thumb {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.15s;
+  min-height: 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.slide-thumb:hover { border-color: var(--border-hi); }
+.slide-thumb.active {
+  border-color: var(--accent);
+  background: var(--hover);
+}
+.slide-thumb .num {
+  font-size: 9px;
+  color: var(--muted);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+.slide-thumb .preview {
+  color: var(--text);
+  font-size: 10px;
+  line-height: 1.3;
+  word-break: keep-all;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+.slide-thumb .del {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0 6px;
+  border-radius: 3px;
+  opacity: 0;
+  transition: opacity 0.15s;
+  line-height: 1;
+}
+.slide-thumb:hover .del { opacity: 1; }
+.slide-thumb .del:hover { color: var(--danger); background: rgba(255,107,107,0.1); }
+
+.add-btn {
+  margin: 8px;
+  padding: 10px;
+  background: transparent;
+  border: 1px dashed var(--border);
+  border-radius: 6px;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.15s;
+  font-size: 12px;
+}
+.add-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* Editor panel */
+.editor-panel {
+  width: 280px;
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+.section { padding: 14px 16px; border-bottom: 1px solid var(--border); }
+.section-title {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+/* Row editor */
+.row-editor {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px;
+  margin-bottom: 8px;
+}
+.row-text {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  outline: none;
+  padding: 4px 0;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+.row-text::placeholder { color: var(--muted); }
+.row-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.size-group {
+  display: flex;
+  gap: 1px;
+  background: var(--panel);
+  border-radius: 4px;
+  padding: 2px;
+}
+.size-group button {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 6px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+.size-group button.active { background: var(--accent); color: #0a1a25; }
+.color-group { display: flex; gap: 4px; align-items: center; }
+.color-swatch {
+  width: 18px;
+  height: 18px;
+  border-radius: 3px;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  padding: 0;
+}
+.color-swatch.text-c { background: var(--text); }
+.color-swatch.accent-c { background: var(--accent); }
+.color-swatch.active { box-shadow: 0 0 0 2px var(--accent); border-color: transparent; }
+.color-group input[type="color"] {
+  width: 22px;
+  height: 22px;
+  border: 1px solid var(--border);
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  border-radius: 3px;
+}
+.row-delete {
+  margin-left: auto;
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 0 6px;
+  border-radius: 3px;
+  line-height: 1;
+}
+.row-delete:hover { color: var(--danger); }
+
+.add-row-btn {
+  width: 100%;
+  padding: 8px;
+  background: transparent;
+  border: 1px dashed var(--border);
+  border-radius: 6px;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 11px;
+}
+.add-row-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* Presets */
+.preset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.preset-btn {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 9px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 11px;
+  transition: all 0.15s;
+}
+.preset-btn:hover { border-color: var(--border-hi); }
+.preset-btn.active {
+  border-color: var(--accent);
+  background: var(--hover);
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* Ranges */
+.range-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.range-row:last-child { margin-bottom: 0; }
+.range-row label {
+  font-size: 11px;
+  color: var(--muted);
+  width: 72px;
+  flex-shrink: 0;
+}
+.range-row input[type="range"] {
+  flex: 1;
+  accent-color: var(--accent);
+  background: transparent;
+}
+.range-row .val {
+  font-size: 11px;
+  color: var(--text);
+  width: 48px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Selects */
+.full-select {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 10px;
+  border-radius: 6px;
+  outline: none;
+  cursor: pointer;
+}
+.full-select:focus { border-color: var(--accent); }
+
+/* Color section */
+.color-pickers { display: grid; gap: 8px; }
+.color-picker-row { display: flex; align-items: center; gap: 10px; }
+.color-picker-row label { flex: 1; font-size: 11px; color: var(--muted); }
+.color-picker-row input[type="color"] {
+  width: 32px; height: 32px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+}
+
+/* Palette */
+.palette-input {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 10px;
+  border-radius: 6px;
+  outline: none;
+  font-family: 'SF Mono', 'Menlo', Monaco, monospace;
+  font-size: 11px;
+  margin-bottom: 8px;
+}
+.palette-input:focus { border-color: var(--accent); }
+.palette-target {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.palette-target > span { margin-right: 4px; }
+.palette-target-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  padding: 3px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 11px;
+  transition: all 0.15s;
+}
+.palette-target-btn.active {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--hover);
+}
+.palette-swatches {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
+}
+.palette-swatch {
+  height: 44px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.1s;
+  overflow: hidden;
+}
+.palette-swatch:hover { transform: translateY(-2px); }
+.palette-swatch .hex-label {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 8px;
+  font-family: 'SF Mono', 'Menlo', Monaco, monospace;
+  font-weight: 700;
+  color: rgba(0,0,0,0.75);
+  background: rgba(255,255,255,0.85);
+  padding: 1px 0;
+  letter-spacing: -0.02em;
+}
+
+/* Font drop */
+.font-drop {
+  margin-top: 8px;
+  padding: 12px;
+  border: 1px dashed var(--border);
+  border-radius: 6px;
+  text-align: center;
+  font-size: 11px;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.font-drop.dragging {
+  border-color: var(--accent);
+  background: var(--hover);
+  color: var(--accent);
+}
+.font-actions { display: flex; gap: 6px; margin-top: 8px; }
+.font-actions button {
+  flex: 1;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 6px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 11px;
+}
+.font-actions button:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ===== Preview ===== */
+.preview-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  min-width: 0;
+  overflow: hidden;
+}
+.preview-stage {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-image:
+    linear-gradient(45deg, rgba(255,255,255,0.015) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(255,255,255,0.015) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, rgba(255,255,255,0.015) 75%),
+    linear-gradient(-45deg, transparent 75%, rgba(255,255,255,0.015) 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+}
+.canvas-wrap {
+  transform-origin: center center;
+  flex-shrink: 0;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+}
+.canvas {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8%;
+}
+.canvas-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  line-height: 1.05;
+  text-align: center;
+  font-weight: 900;
+  word-break: keep-all;
+}
+.canvas-row.size-XL { font-size: 140px; }
+.canvas-row.size-LG { font-size: 90px; }
+.canvas-row.size-MD { font-size: 56px; }
+.canvas-row.size-SM { font-size: 36px; }
+.char {
+  display: inline-block;
+  opacity: 0;
+  animation-fill-mode: forwards;
+  animation-timing-function: cubic-bezier(0.2, 0.9, 0.3, 1.1);
+  will-change: transform, opacity, filter;
+}
+
+@keyframes anim-rise-up    { from { opacity:0; transform: translateY(80px); }  to { opacity:1; transform: translateY(0); } }
+@keyframes anim-drop-in    { from { opacity:0; transform: translateY(-80px); } to { opacity:1; transform: translateY(0); } }
+@keyframes anim-scale-pop  { 0% { opacity:0; transform: scale(0.2); } 60% { opacity:1; transform: scale(1.18); } 100% { opacity:1; transform: scale(1); } }
+@keyframes anim-slide-left { from { opacity:0; transform: translateX(100px); } to { opacity:1; transform: translateX(0); } }
+@keyframes anim-blur-in    { from { opacity:0; filter: blur(24px); }            to { opacity:1; filter: blur(0); } }
+@keyframes anim-rotate     { from { opacity:0; transform: rotate(-180deg) scale(0.3); } to { opacity:1; transform: rotate(0deg) scale(1); } }
+
+.preset-rise-up    .char { animation-name: anim-rise-up; }
+.preset-drop-in    .char { animation-name: anim-drop-in; }
+.preset-scale-pop  .char { animation-name: anim-scale-pop; }
+.preset-slide-left .char { animation-name: anim-slide-left; }
+.preset-blur-in    .char { animation-name: anim-blur-in; }
+.preset-rotate     .char { animation-name: anim-rotate; }
+
+.preview-controls {
+  height: 56px;
+  background: var(--panel);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.preview-controls button {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.15s;
+}
+.preview-controls button:hover { border-color: var(--accent); color: var(--accent); }
+.preview-controls button.active {
+  background: var(--accent);
+  color: #0a1a25;
+  border-color: var(--accent);
+}
+.preview-controls .info {
+  font-size: 11px;
+  color: var(--muted);
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Overlay */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(7, 15, 24, 0.88);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  flex-direction: column;
+  gap: 16px;
+}
+.overlay-msg { font-size: 14px; color: var(--accent); font-weight: 700; }
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Icon-only button (header ⓘ / 🌐) */
+.topbar button.icon-only {
+  padding: 6px 9px;
+  font-size: 14px;
+  line-height: 1;
+}
+
+/* Language dropdown menu */
+.lang-wrap { position: relative; }
+.lang-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  background: var(--panel);
+  border: 1px solid var(--border-hi);
+  border-radius: 6px;
+  min-width: 140px;
+  z-index: 150;
+  display: none;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.55);
+}
+.lang-menu.open { display: block; }
+.lang-option {
+  display: block;
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  text-align: left;
+  padding: 9px 14px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background 0.1s, color 0.1s;
+  font-family: inherit;
+}
+.lang-option:hover { background: var(--hover); color: var(--accent); }
+.lang-option.active {
+  color: var(--accent);
+  background: var(--hover);
+  font-weight: 700;
+}
+
+/* Help modal */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(7, 15, 24, 0.72);
+  backdrop-filter: blur(6px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  animation: modal-fade 0.15s ease;
+}
+.modal.open { display: flex; }
+@keyframes modal-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.modal-panel {
+  background: var(--panel);
+  border: 1px solid var(--border-hi);
+  border-radius: 10px;
+  width: 480px;
+  max-width: 90vw;
+  max-height: 80vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 16px 60px rgba(0,0,0,0.6);
+}
+.modal-header {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.modal-header h2 {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: -0.01em;
+  flex: 1;
+}
+.modal-close {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  font-size: 20px;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0 6px;
+  border-radius: 4px;
+}
+.modal-close:hover { color: var(--accent); background: var(--hover); }
+.modal-body {
+  padding: 18px;
+  overflow-y: auto;
+}
+.help-list { margin: 0; }
+.help-list dt {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.02em;
+  margin-bottom: 4px;
+}
+.help-list dd {
+  font-size: 12px;
+  color: var(--text);
+  margin: 0 0 14px 0;
+  padding-left: 0;
+  line-height: 1.55;
+}
+.help-list dd:last-of-type { margin-bottom: 0; }
+.help-hint {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  font-size: 10px;
+  color: var(--muted);
+  text-align: center;
+  letter-spacing: 0.05em;
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border-hi); }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <h1>Kinetic Editor</h1>
+  <span class="badge">203 DESIGN SYSTEM</span>
+  <div class="spacer"></div>
+  <button id="btn-load-json" data-i18n="btn_load">JSON 불러오기</button>
+  <button id="btn-save-json" data-i18n="btn_save">JSON 저장</button>
+  <button id="btn-export-html" data-i18n="btn_html">HTML 내보내기</button>
+  <button id="btn-export-png" data-i18n="btn_png">PNG 저장</button>
+  <button class="primary" id="btn-record-webm" data-i18n="btn_webm">● WebM 녹화</button>
+  <button class="danger" id="btn-record-mp4" data-i18n="btn_mp4">● MP4 저장</button>
+  <div class="lang-wrap">
+    <button class="icon-only" id="btn-lang" data-i18n-title="tip_lang" title="언어 변경">🌐</button>
+    <div class="lang-menu" id="lang-menu">
+      <button class="lang-option" data-lang="ko">한국어</button>
+      <button class="lang-option" data-lang="en">English</button>
+      <button class="lang-option" data-lang="zh">中文</button>
+      <button class="lang-option" data-lang="ja">日本語</button>
+    </div>
+  </div>
+  <button class="icon-only" id="btn-help" data-i18n-title="tip_help" title="버튼 설명">ⓘ</button>
+</header>
+
+<div class="main">
+  <aside class="slides-panel">
+    <div class="panel-title" data-i18n="panel_slides">슬라이드</div>
+    <div class="slides-list" id="slides-list"></div>
+    <button class="add-btn" id="add-slide" data-i18n="add_slide">+ 슬라이드 추가</button>
+  </aside>
+
+  <aside class="editor-panel">
+    <section class="section">
+      <div class="section-title" data-i18n="sec_rows">행 편집</div>
+      <div id="rows-list"></div>
+      <button class="add-row-btn" id="add-row" data-i18n="add_row">+ 행 추가</button>
+    </section>
+
+    <section class="section">
+      <div class="section-title" data-i18n="sec_presets">키네틱 프리셋</div>
+      <div class="preset-grid" id="presets"></div>
+    </section>
+
+    <section class="section">
+      <div class="section-title" data-i18n="sec_quote">따옴표 스타일</div>
+      <select class="full-select" id="quote-style">
+        <option value="round" data-i18n="quote_round">둥근  “ ”</option>
+        <option value="straight" data-i18n="quote_straight">곧은  " "</option>
+        <option value="angle" data-i18n="quote_angle">꺾쇠  《 》</option>
+        <option value="none" data-i18n="quote_none">없음</option>
+      </select>
+    </section>
+
+    <section class="section">
+      <div class="section-title" data-i18n="sec_timing">타이밍</div>
+      <div class="range-row">
+        <label data-i18n="timing_row_delay">행 딜레이</label>
+        <input type="range" id="row-delay" min="0" max="500" value="100" step="10">
+        <span class="val" id="row-delay-v">100ms</span>
+      </div>
+      <div class="range-row">
+        <label data-i18n="timing_row_spacing">행 간격</label>
+        <input type="range" id="row-spacing" min="0" max="80" value="20" step="1">
+        <span class="val" id="row-spacing-v">20px</span>
+      </div>
+      <div class="range-row">
+        <label data-i18n="timing_letter_spacing">자간</label>
+        <input type="range" id="letter-spacing" min="-5" max="20" value="0" step="0.5">
+        <span class="val" id="letter-spacing-v">0px</span>
+      </div>
+      <div class="range-row">
+        <label data-i18n="timing_dwell">체류시간</label>
+        <input type="range" id="dwell-time" min="500" max="5000" value="2000" step="100">
+        <span class="val" id="dwell-time-v">2.0s</span>
+      </div>
+      <div class="range-row">
+        <label data-i18n="timing_trans">전환속도</label>
+        <input type="range" id="trans-speed" min="200" max="2000" value="600" step="50">
+        <span class="val" id="trans-speed-v">600ms</span>
+      </div>
+      <div class="range-row">
+        <label data-i18n="timing_slide_interval">슬라이드 간격</label>
+        <input type="range" id="slide-interval" min="1000" max="10000" value="3000" step="100">
+        <span class="val" id="slide-interval-v">3.0s</span>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-title" data-i18n="sec_font">서체</div>
+      <select class="full-select" id="font-select"></select>
+      <div class="font-actions">
+        <button id="btn-local-fonts" data-i18n="btn_local_fonts">로컬 폰트 불러오기</button>
+      </div>
+      <div class="font-drop" id="font-drop" data-i18n="font_drop">
+        .ttf / .otf / .woff 파일을 드래그하세요
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-title" data-i18n="sec_colors">색상</div>
+      <div class="color-pickers">
+        <div class="color-picker-row">
+          <label data-i18n="color_text">텍스트</label>
+          <input type="color" id="color-text" value="#EEF8FA">
+        </div>
+        <div class="color-picker-row">
+          <label data-i18n="color_accent">강조</label>
+          <input type="color" id="color-accent" value="#7FCEDC">
+        </div>
+        <div class="color-picker-row">
+          <label data-i18n="color_bg">배경</label>
+          <input type="color" id="color-bg" value="#0d1f30">
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-title" data-i18n="sec_palette">팔레트 (5색)</div>
+      <input type="text" class="palette-input" id="palette-input" placeholder="#7FCEDC, #EEF8FA, #0d1f30, ...">
+      <div class="palette-target">
+        <span data-i18n="palette_apply">적용:</span>
+        <button class="palette-target-btn active" data-target="text" data-i18n="color_text">텍스트</button>
+        <button class="palette-target-btn" data-target="accent" data-i18n="color_accent">강조</button>
+      </div>
+      <div class="palette-swatches" id="palette-swatches"></div>
+    </section>
+
+    <section class="section">
+      <div class="section-title" data-i18n="sec_output">출력 사이즈</div>
+      <select class="full-select" id="output-size"></select>
+    </section>
+  </aside>
+
+  <main class="preview-panel">
+    <div class="preview-stage" id="preview-stage">
+      <div class="canvas-wrap" id="canvas-wrap">
+        <div class="canvas" id="canvas"></div>
+      </div>
+    </div>
+    <div class="preview-controls">
+      <button id="btn-replay" data-i18n="btn_replay">▶ 재생</button>
+      <button id="btn-autoplay" data-i18n="btn_autoplay">자동 재생</button>
+      <span class="info" id="size-info">1920 × 1080</span>
+    </div>
+  </main>
+</div>
+
+<input type="file" id="json-input" accept=".json" style="display:none">
+<input type="file" id="font-input" accept=".ttf,.otf,.woff,.woff2" style="display:none" multiple>
+
+<div class="modal" id="help-modal" aria-hidden="true">
+  <div class="modal-panel" role="dialog" aria-labelledby="help-title">
+    <div class="modal-header">
+      <h2 id="help-title" data-i18n="help_title">상단 버튼 설명</h2>
+      <button class="modal-close" id="help-close" aria-label="닫기">×</button>
+    </div>
+    <div class="modal-body">
+      <dl class="help-list">
+        <dt data-i18n="btn_load">JSON 불러오기</dt>
+        <dd data-i18n="help_load">저장된 작업 파일(.json)을 열어 이어서 편집</dd>
+        <dt data-i18n="btn_save">JSON 저장</dt>
+        <dd data-i18n="help_save">현재 작업 전체를 .json으로 저장 (나중에 다시 열 수 있음)</dd>
+        <dt data-i18n="btn_html">HTML 내보내기</dt>
+        <dd data-i18n="help_html">단독 실행 가능한 .html 파일로 저장 (공유·아카이브용)</dd>
+        <dt data-i18n="btn_png">PNG 저장</dt>
+        <dd data-i18n="help_png">현재 슬라이드를 이미지로 저장</dd>
+        <dt data-i18n="btn_webm">● WebM 녹화</dt>
+        <dd data-i18n="help_webm">재생 버튼 누른 후 애니메이션을 영상으로 녹화</dd>
+        <dt data-i18n="btn_mp4">● MP4 저장</dt>
+        <dd data-i18n="help_mp4">MediaRecorder로 직접 MP4 녹화 (Chrome/Edge). 미지원 시 .webm으로 자동 저장</dd>
+      </dl>
+      <div class="help-hint" data-i18n="help_hint">ESC 또는 바깥 클릭으로 닫기</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== Constants =====
+const PRESETS = [
+  { key: 'rise-up',    label: 'Rise Up' },
+  { key: 'drop-in',    label: 'Drop In' },
+  { key: 'scale-pop',  label: 'Scale Pop' },
+  { key: 'slide-left', label: 'Slide Left' },
+  { key: 'blur-in',    label: 'Blur In' },
+  { key: 'rotate',     label: 'Rotate' }
+];
+const OUTPUT_GROUPS = [
+  { key: 'out_h', items: [
+    { w: 1920, h: 1080, key: 'out_yt',  spec: '16:9 — 1920×1080' },
+    { w: 1600, h: 900,  key: 'out_tw',  spec: '16:9 — 1600×900' },
+    { w: 1200, h: 630,  key: 'out_fb',  spec: '1.91:1 — 1200×630' },
+    { w: 1200, h: 627,  key: 'out_li',  spec: '1.91:1 — 1200×627' }
+  ]},
+  { key: 'out_sq', items: [
+    { w: 1080, h: 1080, key: 'out_ig_sq', spec: '1:1 — 1080×1080' },
+    { w: 800,  h: 800,  key: 'out_kakao', spec: '800×800' }
+  ]},
+  { key: 'out_v', items: [
+    { w: 1080, h: 1350, key: 'out_ig_feed',  spec: '4:5 — 1080×1350' },
+    { w: 1080, h: 1920, key: 'out_ig_reels', spec: '9:16 — 1080×1920' },
+    { w: 1000, h: 1500, key: 'out_pin',      spec: '2:3 — 1000×1500' }
+  ]}
+];
+const OUTPUT_KEY = (o) => `${o.w}x${o.h}`;
+
+// 언어별 기본 폰트 매핑
+const LANG_FONTS = {
+  ko: '"Pretendard Variable", "Pretendard", "Noto Sans KR", sans-serif',
+  en: '"Noto Sans", "Noto Sans KR", sans-serif',
+  zh: '"Noto Sans SC", "Noto Sans KR", sans-serif',
+  ja: '"Noto Sans JP", "Noto Sans KR", sans-serif'
+};
+
+// i18n 사전
+const I18N = {
+  ko: {
+    btn_load: 'JSON 불러오기', btn_save: 'JSON 저장', btn_html: 'HTML 내보내기',
+    btn_png: 'PNG 저장', btn_webm: '● WebM 녹화', btn_mp4: '● MP4 저장',
+    tip_help: '버튼 설명', tip_lang: '언어 변경',
+    panel_slides: '슬라이드', add_slide: '+ 슬라이드 추가',
+    sec_rows: '행 편집', add_row: '+ 행 추가', row_placeholder: '텍스트 입력',
+    sec_presets: '키네틱 프리셋',
+    sec_quote: '따옴표 스타일',
+    quote_round: '둥근  “ ”', quote_straight: '곧은  " "', quote_angle: '꺾쇠  《 》', quote_none: '없음',
+    sec_timing: '타이밍',
+    timing_row_delay: '행 딜레이', timing_row_spacing: '행 간격', timing_letter_spacing: '자간',
+    timing_dwell: '체류시간', timing_trans: '전환속도', timing_slide_interval: '슬라이드 간격',
+    sec_font: '서체', btn_local_fonts: '로컬 폰트 불러오기', font_drop: '.ttf / .otf / .woff 파일을 드래그하세요',
+    sec_colors: '색상', color_text: '텍스트', color_accent: '강조', color_bg: '배경',
+    sec_palette: '팔레트 (5색)', palette_apply: '적용:',
+    sec_output: '출력 사이즈',
+    out_h: '가로형', out_sq: '정사각', out_v: '세로형',
+    out_yt: '유튜브/일반', out_tw: '트위터/X', out_fb: '페이스북 링크', out_li: '링크드인',
+    out_ig_sq: '인스타 정사각', out_kakao: '카카오',
+    out_ig_feed: '인스타 피드', out_ig_reels: '인스타 스토리/릴스', out_pin: '핀터레스트',
+    btn_replay: '▶ 재생', btn_autoplay: '자동 재생',
+    overlay_recording: '녹화 중', overlay_finishing: '마무리 (+ 2s 버퍼)', overlay_png: 'PNG 생성 중...',
+    empty_slide: '(비어있음)',
+    help_title: '상단 버튼 설명',
+    help_load: '저장된 작업 파일(.json)을 열어 이어서 편집',
+    help_save: '현재 작업 전체를 .json으로 저장 (나중에 다시 열 수 있음)',
+    help_html: '단독 실행 가능한 .html 파일로 저장 (공유·아카이브용)',
+    help_png: '현재 슬라이드를 이미지로 저장',
+    help_webm: '재생 버튼 누른 후 애니메이션을 영상으로 녹화',
+    help_mp4: 'MediaRecorder로 직접 MP4 녹화 (Chrome/Edge). 미지원 시 .webm으로 자동 저장',
+    help_hint: 'ESC 또는 바깥 클릭으로 닫기'
+  },
+  en: {
+    btn_load: 'Load JSON', btn_save: 'Save JSON', btn_html: 'Export HTML',
+    btn_png: 'Save PNG', btn_webm: '● Record WebM', btn_mp4: '● Save MP4',
+    tip_help: 'Button Guide', tip_lang: 'Language',
+    panel_slides: 'SLIDES', add_slide: '+ Add Slide',
+    sec_rows: 'ROWS', add_row: '+ Add Row', row_placeholder: 'Enter text',
+    sec_presets: 'ANIMATION PRESET',
+    sec_quote: 'QUOTE STYLE',
+    quote_round: 'Curly  “ ”', quote_straight: 'Straight  " "', quote_angle: 'Angle  《 》', quote_none: 'None',
+    sec_timing: 'TIMING',
+    timing_row_delay: 'Row Delay', timing_row_spacing: 'Row Spacing', timing_letter_spacing: 'Letter Spacing',
+    timing_dwell: 'Dwell Time', timing_trans: 'Transition', timing_slide_interval: 'Slide Interval',
+    sec_font: 'TYPEFACE', btn_local_fonts: 'Load Local Fonts', font_drop: 'Drop .ttf / .otf / .woff here',
+    sec_colors: 'COLORS', color_text: 'Text', color_accent: 'Accent', color_bg: 'Background',
+    sec_palette: 'PALETTE (5 colors)', palette_apply: 'Apply to:',
+    sec_output: 'OUTPUT SIZE',
+    out_h: 'Landscape', out_sq: 'Square', out_v: 'Portrait',
+    out_yt: 'YouTube/General', out_tw: 'Twitter/X', out_fb: 'Facebook Link', out_li: 'LinkedIn',
+    out_ig_sq: 'Instagram Square', out_kakao: 'Kakao',
+    out_ig_feed: 'Instagram Feed', out_ig_reels: 'Instagram Story/Reels', out_pin: 'Pinterest',
+    btn_replay: '▶ Play', btn_autoplay: 'Autoplay',
+    overlay_recording: 'Recording', overlay_finishing: 'Finishing (+ 2s buffer)', overlay_png: 'Generating PNG...',
+    empty_slide: '(empty)',
+    help_title: 'Top Bar Buttons',
+    help_load: 'Open a saved .json file to continue editing',
+    help_save: 'Save current work as .json (re-openable later)',
+    help_html: 'Save as standalone .html file (for sharing/archiving)',
+    help_png: 'Save current slide as image',
+    help_webm: 'Record animation as video after pressing Play',
+    help_mp4: 'Native MP4 recording via MediaRecorder (Chrome/Edge). Fallback to .webm',
+    help_hint: 'Close with ESC or click outside'
+  },
+  zh: {
+    btn_load: '加载 JSON', btn_save: '保存 JSON', btn_html: '导出 HTML',
+    btn_png: '保存 PNG', btn_webm: '● 录制 WebM', btn_mp4: '● 保存 MP4',
+    tip_help: '按钮说明', tip_lang: '语言',
+    panel_slides: '幻灯片', add_slide: '+ 添加幻灯片',
+    sec_rows: '行编辑', add_row: '+ 添加行', row_placeholder: '输入文本',
+    sec_presets: '动画预设',
+    sec_quote: '引号样式',
+    quote_round: '弯曲  “ ”', quote_straight: '直  " "', quote_angle: '尖括号  《 》', quote_none: '无',
+    sec_timing: '时间',
+    timing_row_delay: '行延迟', timing_row_spacing: '行间距', timing_letter_spacing: '字间距',
+    timing_dwell: '停留时间', timing_trans: '过渡速度', timing_slide_interval: '幻灯片间隔',
+    sec_font: '字体', btn_local_fonts: '加载本地字体', font_drop: '拖入 .ttf / .otf / .woff 文件',
+    sec_colors: '颜色', color_text: '文本', color_accent: '强调', color_bg: '背景',
+    sec_palette: '调色板（5色）', palette_apply: '应用于:',
+    sec_output: '输出尺寸',
+    out_h: '横向', out_sq: '方形', out_v: '纵向',
+    out_yt: 'YouTube/通用', out_tw: 'Twitter/X', out_fb: 'Facebook 链接', out_li: 'LinkedIn',
+    out_ig_sq: 'Instagram 方形', out_kakao: 'Kakao',
+    out_ig_feed: 'Instagram 信息流', out_ig_reels: 'Instagram 故事/Reels', out_pin: 'Pinterest',
+    btn_replay: '▶ 播放', btn_autoplay: '自动播放',
+    overlay_recording: '录制中', overlay_finishing: '收尾 (+ 2s 缓冲)', overlay_png: '生成 PNG 中...',
+    empty_slide: '（空）',
+    help_title: '顶部按钮说明',
+    help_load: '打开保存的 .json 文件继续编辑',
+    help_save: '保存当前工作为 .json（可稍后重新打开）',
+    help_html: '保存为独立 .html 文件（用于分享和存档）',
+    help_png: '将当前幻灯片保存为图像',
+    help_webm: '按播放后将动画录制为视频',
+    help_mp4: '通过 MediaRecorder 直接录制 MP4（Chrome/Edge）。不支持时回退到 .webm',
+    help_hint: '按 ESC 或点击外部关闭'
+  },
+  ja: {
+    btn_load: 'JSON 読込', btn_save: 'JSON 保存', btn_html: 'HTML 出力',
+    btn_png: 'PNG 保存', btn_webm: '● WebM 録画', btn_mp4: '● MP4 保存',
+    tip_help: 'ボタン説明', tip_lang: '言語',
+    panel_slides: 'スライド', add_slide: '+ スライド追加',
+    sec_rows: '行編集', add_row: '+ 行追加', row_placeholder: 'テキスト入力',
+    sec_presets: 'アニメーションプリセット',
+    sec_quote: '引用符スタイル',
+    quote_round: '丸  “ ”', quote_straight: 'ストレート  " "', quote_angle: '山かっこ  《 》', quote_none: 'なし',
+    sec_timing: 'タイミング',
+    timing_row_delay: '行遅延', timing_row_spacing: '行間隔', timing_letter_spacing: '文字間隔',
+    timing_dwell: '滞在時間', timing_trans: '遷移速度', timing_slide_interval: 'スライド間隔',
+    sec_font: 'フォント', btn_local_fonts: 'ローカルフォント読込', font_drop: '.ttf / .otf / .woff をドラッグ',
+    sec_colors: '色', color_text: 'テキスト', color_accent: 'アクセント', color_bg: '背景',
+    sec_palette: 'パレット (5色)', palette_apply: '適用:',
+    sec_output: '出力サイズ',
+    out_h: '横向き', out_sq: '正方形', out_v: '縦向き',
+    out_yt: 'YouTube/一般', out_tw: 'Twitter/X', out_fb: 'Facebook リンク', out_li: 'LinkedIn',
+    out_ig_sq: 'Instagram 正方形', out_kakao: 'Kakao',
+    out_ig_feed: 'Instagram フィード', out_ig_reels: 'Instagram ストーリー/リール', out_pin: 'Pinterest',
+    btn_replay: '▶ 再生', btn_autoplay: '自動再生',
+    overlay_recording: '録画中', overlay_finishing: '仕上げ (+ 2s バッファ)', overlay_png: 'PNG 生成中...',
+    empty_slide: '（空）',
+    help_title: '上部ボタンの説明',
+    help_load: '保存された .json ファイルを開いて編集を続ける',
+    help_save: '現在の作業全体を .json で保存（後で再度開ける）',
+    help_html: '単独実行可能な .html ファイルとして保存（共有・アーカイブ用）',
+    help_png: '現在のスライドを画像として保存',
+    help_webm: '再生ボタンを押してアニメーションを動画として録画',
+    help_mp4: 'MediaRecorderで直接MP4録画（Chrome/Edge）。非対応時は.webmで自動保存',
+    help_hint: 'ESCまたは外側クリックで閉じる'
+  }
+};
+
+function t(key) {
+  return (I18N[state?.lang] && I18N[state.lang][key]) || I18N.ko[key] || key;
+}
+const DEFAULT_FONTS = [
+  { label: 'Pretendard',             family: '"Pretendard Variable", "Pretendard", "Noto Sans KR", sans-serif' },
+  { label: 'Noto Sans KR',           family: '"Noto Sans KR", sans-serif' },
+  { label: 'Noto Sans (EN)',         family: '"Noto Sans", "Noto Sans KR", sans-serif' },
+  { label: 'Noto Sans SC (中文)',    family: '"Noto Sans SC", "Noto Sans KR", sans-serif' },
+  { label: 'Noto Sans JP (日本語)',  family: '"Noto Sans JP", "Noto Sans KR", sans-serif' },
+  { label: 'IBM Plex Sans KR',       family: '"IBM Plex Sans KR", "Noto Sans KR", sans-serif' },
+  { label: 'Anton + Black Han Sans', family: '"Anton", "Black Han Sans", "Noto Sans KR", sans-serif' },
+  { label: 'Do Hyeon',               family: '"Do Hyeon", "Noto Sans KR", sans-serif' }
+];
+const FONT_CDN_LINKS = `
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&family=IBM+Plex+Sans+KR:wght@400;700&family=Anton&family=Black+Han+Sans&family=Do+Hyeon&display=swap" rel="stylesheet">`;
+
+// ===== State =====
+const state = {
+  slides: [
+    {
+      preset: 'rise-up',
+      rows: [
+        { text: 'Kinetic',    size: 'LG', color: 'text' },
+        { text: 'Typography', size: 'XL', color: 'accent' }
+      ]
+    },
+    {
+      preset: 'blur-in',
+      rows: [
+        { text: 'Designed by',          size: 'MD', color: 'text' },
+        { text: 'Infographics Lab 203', size: 'LG', color: 'accent' }
+      ]
+    }
+  ],
+  currentSlide: 0,
+  timing: { rowDelay: 100, dwellTime: 2000, transitionSpeed: 600, slideInterval: 3000, rowSpacing: 20, letterSpacing: 0 },
+  font: DEFAULT_FONTS[0].family,
+  fonts: [...DEFAULT_FONTS],
+  quoteStyle: 'round',
+  palette: ['#7FCEDC', '#EEF8FA', '#A0E1EA', '#3C7B8C', '#0D1F30'],
+  paletteTarget: 'text',
+  colors: { text: '#EEF8FA', accent: '#7FCEDC', bg: '#0d1f30' },
+  output: { w: 1920, h: 1080 },
+  autoplay: false,
+  lang: 'ko'
+};
+
+// ===== DOM Helpers =====
+const $ = id => document.getElementById(id);
+const el = (tag, props = {}, children = []) => {
+  const e = document.createElement(tag);
+  Object.entries(props).forEach(([k, v]) => {
+    if (k === 'class') e.className = v;
+    else if (k === 'on') Object.entries(v).forEach(([ev, fn]) => e.addEventListener(ev, fn));
+    else if (k === 'style' && typeof v === 'object') Object.assign(e.style, v);
+    else if (k in e) e[k] = v;
+    else e.setAttribute(k, v);
+  });
+  children.forEach(c => e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c));
+  return e;
+};
+
+// 렌더링 직전에만 적용되는 따옴표/꺾쇠 정규화.
+// 입력값(state.slides[].rows[].text)은 절대 수정하지 않는다.
+// state.quoteStyle 에 따라 전역 일괄 처리.
+function transformQuotes(text) {
+  if (!text) return text;
+  const style = state.quoteStyle || 'round';
+  if (style === 'none') return text.replace(/["“”《》]/g, '');
+  if (style === 'straight') return text.replace(/[“”《》]/g, '"');
+  const [open, close] = style === 'angle' ? ['《', '》'] : ['“', '”'];
+  // 1) 기존 곡선/꺾쇠 모두 곧은 " 로 정규화 → 2) 위치 기반 매칭
+  const t = text.replace(/[“”《》]/g, '"');
+  return t
+    .replace(/(\s|^)"(\S)/g, '$1' + open + '$2')
+    .replace(/(\S)"(\s|$)/g, '$1' + close + '$2')
+    .replace(/(\S)"$/g,      '$1' + close)
+    .replace(/^"(\S)/g,      open + '$1');
+}
+
+const currentSlide = () => state.slides[state.currentSlide];
+
+function resolveColor(c) {
+  if (c === 'text') return state.colors.text;
+  if (c === 'accent') return state.colors.accent;
+  return c;
+}
+
+// ===== Palette =====
+function parsePalette(text) {
+  return text.split(/[,\s]+/)
+    .map(s => s.trim())
+    .filter(Boolean)
+    .map(s => s.startsWith('#') ? s : '#' + s)
+    .filter(s => /^#[0-9a-fA-F]{3}([0-9a-fA-F]{3})?$/.test(s))
+    .slice(0, 5);
+}
+
+// ===== Slide / Row Actions =====
+function addSlide() {
+  state.slides.push({
+    preset: 'rise-up',
+    rows: [{ text: '새 슬라이드', size: 'LG', color: 'text' }]
+  });
+  state.currentSlide = state.slides.length - 1;
+  renderAll();
+}
+function deleteSlide(idx) {
+  if (state.slides.length === 1) return;
+  state.slides.splice(idx, 1);
+  if (state.currentSlide >= state.slides.length) state.currentSlide = state.slides.length - 1;
+  renderAll();
+}
+function selectSlide(idx) {
+  state.currentSlide = idx;
+  renderAll();
+}
+function addRow() {
+  currentSlide().rows.push({ text: '', size: 'MD', color: 'text' });
+  renderRowEditor();
+  renderPreview();
+  renderSlideList();
+}
+function deleteRow(idx) {
+  const rows = currentSlide().rows;
+  if (rows.length === 1) return;
+  rows.splice(idx, 1);
+  renderRowEditor();
+  renderPreview();
+  renderSlideList();
+}
+function updateRow(idx, field, value) {
+  currentSlide().rows[idx][field] = value;
+  if (field !== 'text') renderRowEditor();
+  renderPreview();
+  renderSlideList();
+}
+function setPreset(p) {
+  currentSlide().preset = p;
+  renderPresets();
+  renderPreview();
+}
+
+// ===== Renderers =====
+function renderSlideList() {
+  const list = $('slides-list');
+  list.innerHTML = '';
+  state.slides.forEach((slide, idx) => {
+    const text = slide.rows.map(r => r.text).filter(Boolean).join(' / ').slice(0, 36) || t('empty_slide');
+    const thumb = el('div', {
+      class: 'slide-thumb' + (idx === state.currentSlide ? ' active' : ''),
+      on: { click: () => selectSlide(idx) }
+    }, [
+      el('div', { class: 'num' }, [`#${String(idx + 1).padStart(2, '0')}`]),
+      el('div', { class: 'preview' }, [text])
+    ]);
+    if (state.slides.length > 1) {
+      thumb.appendChild(el('button', {
+        class: 'del',
+        innerHTML: '×',
+        on: { click: e => { e.stopPropagation(); deleteSlide(idx); } }
+      }));
+    }
+    list.appendChild(thumb);
+  });
+}
+
+function renderRowEditor() {
+  const list = $('rows-list');
+  list.innerHTML = '';
+  currentSlide().rows.forEach((row, idx) => {
+    const sizeBtns = ['XL', 'LG', 'MD', 'SM'].map(s =>
+      el('button', {
+        class: row.size === s ? 'active' : '',
+        innerHTML: s,
+        on: { click: () => updateRow(idx, 'size', s) }
+      })
+    );
+    const isCustom = typeof row.color === 'string' && row.color.startsWith('#');
+    const textActive = row.color === 'text' ? ' active' : '';
+    const accentActive = row.color === 'accent' ? ' active' : '';
+    const pickerVal = isCustom ? row.color : (row.color === 'accent' ? state.colors.accent : state.colors.text);
+
+    const colorGroup = el('div', { class: 'color-group' }, [
+      el('button', {
+        class: 'color-swatch text-c' + textActive,
+        title: '텍스트 색상',
+        on: { click: () => updateRow(idx, 'color', 'text') }
+      }),
+      el('button', {
+        class: 'color-swatch accent-c' + accentActive,
+        title: '강조 색상',
+        on: { click: () => updateRow(idx, 'color', 'accent') }
+      }),
+      el('input', {
+        type: 'color',
+        value: pickerVal,
+        title: '사용자 정의 색상',
+        on: { input: e => updateRow(idx, 'color', e.target.value) }
+      })
+    ]);
+
+    const textInput = el('input', {
+      type: 'text',
+      class: 'row-text',
+      value: row.text,
+      placeholder: t('row_placeholder'),
+      on: { input: e => updateRow(idx, 'text', e.target.value) }
+    });
+
+    const controls = el('div', { class: 'row-controls' }, [
+      el('div', { class: 'size-group' }, sizeBtns),
+      colorGroup,
+      el('button', {
+        class: 'row-delete',
+        innerHTML: '×',
+        title: '행 삭제',
+        on: { click: () => deleteRow(idx) }
+      })
+    ]);
+
+    list.appendChild(el('div', { class: 'row-editor' }, [textInput, controls]));
+  });
+}
+
+function renderPresets() {
+  const grid = $('presets');
+  grid.innerHTML = '';
+  PRESETS.forEach(p => {
+    grid.appendChild(el('button', {
+      class: 'preset-btn' + (currentSlide().preset === p.key ? ' active' : ''),
+      innerHTML: p.label,
+      on: { click: () => setPreset(p.key) }
+    }));
+  });
+}
+
+function renderTimingValues() {
+  $('row-delay-v').textContent = state.timing.rowDelay + 'ms';
+  $('row-spacing-v').textContent = state.timing.rowSpacing + 'px';
+  $('letter-spacing-v').textContent = state.timing.letterSpacing + 'px';
+  $('dwell-time-v').textContent = (state.timing.dwellTime / 1000).toFixed(1) + 's';
+  $('trans-speed-v').textContent = state.timing.transitionSpeed + 'ms';
+  $('slide-interval-v').textContent = (state.timing.slideInterval / 1000).toFixed(1) + 's';
+  $('row-delay').value = state.timing.rowDelay;
+  $('row-spacing').value = state.timing.rowSpacing;
+  $('letter-spacing').value = state.timing.letterSpacing;
+  $('dwell-time').value = state.timing.dwellTime;
+  $('trans-speed').value = state.timing.transitionSpeed;
+  $('slide-interval').value = state.timing.slideInterval;
+}
+
+function renderPalette() {
+  const cont = $('palette-swatches');
+  cont.innerHTML = '';
+  for (let i = 0; i < 5; i++) {
+    const hex = state.palette[i];
+    if (!hex) {
+      cont.appendChild(el('div', {
+        class: 'palette-swatch',
+        style: { background: 'transparent', borderStyle: 'dashed' }
+      }));
+      continue;
+    }
+    const sw = el('div', {
+      class: 'palette-swatch',
+      style: { background: hex },
+      title: `${hex} → ${state.paletteTarget === 'text' ? '텍스트' : '강조'} 색상 적용`,
+      on: { click: () => {
+        if (state.paletteTarget === 'text') {
+          state.colors.text = hex;
+          $('color-text').value = hex;
+        } else {
+          state.colors.accent = hex;
+          $('color-accent').value = hex;
+        }
+        renderPreview();
+        renderRowEditor();
+      }}
+    }, [
+      el('div', { class: 'hex-label', innerHTML: hex.toUpperCase() })
+    ]);
+    cont.appendChild(sw);
+  }
+}
+
+function renderPreview() {
+  const canvas = $('canvas');
+  const slide = currentSlide();
+  canvas.className = 'canvas preset-' + slide.preset;
+  canvas.style.fontFamily = state.font;
+  canvas.style.background = state.colors.bg;
+  canvas.style.gap = state.timing.rowSpacing + 'px';
+  canvas.style.letterSpacing = state.timing.letterSpacing + 'px';
+  canvas.style.width = state.output.w + 'px';
+  canvas.style.height = state.output.h + 'px';
+
+  const wrap = $('canvas-wrap');
+  wrap.style.width = state.output.w + 'px';
+  wrap.style.height = state.output.h + 'px';
+
+  canvas.innerHTML = '';
+  let charIndex = 0;
+  slide.rows.forEach((row, rowIdx) => {
+    const rowEl = el('div', { class: 'canvas-row size-' + row.size });
+    rowEl.style.color = resolveColor(row.color);
+    // 렌더링 직전 따옴표 치환 — state는 건드리지 않는다
+    const drawText = transformQuotes(row.text || '');
+    [...drawText].forEach(ch => {
+      const span = el('span', {
+        class: 'char',
+        innerHTML: ch === ' ' ? '&nbsp;' : ch
+      });
+      const delay = rowIdx * state.timing.rowDelay + charIndex * (state.timing.rowDelay / 4);
+      span.style.animationDelay = delay + 'ms';
+      span.style.animationDuration = state.timing.transitionSpeed + 'ms';
+      rowEl.appendChild(span);
+      charIndex++;
+    });
+    canvas.appendChild(rowEl);
+  });
+
+  resizePreview();
+  $('size-info').textContent = `${state.output.w} × ${state.output.h}`;
+}
+
+function resizePreview() {
+  const stage = $('preview-stage');
+  const wrap = $('canvas-wrap');
+  const rect = stage.getBoundingClientRect();
+  const padding = 40;
+  const scale = Math.min(
+    (rect.width - padding * 2) / state.output.w,
+    (rect.height - padding * 2) / state.output.h,
+    1
+  );
+  wrap.style.transform = `scale(${scale})`;
+}
+
+function renderFontSelect() {
+  const sel = $('font-select');
+  sel.innerHTML = '';
+  state.fonts.forEach(f => {
+    sel.appendChild(el('option', { value: f.family, innerHTML: f.label }));
+  });
+  sel.value = state.font;
+}
+
+function renderAll() {
+  renderSlideList();
+  renderRowEditor();
+  renderPresets();
+  renderTimingValues();
+  renderPreview();
+}
+
+// ===== Replay & Autoplay =====
+function replay() { renderPreview(); }
+
+let autoplayTimer = null;
+function toggleAutoplay() {
+  if (state.autoplay) {
+    state.autoplay = false;
+    clearTimeout(autoplayTimer);
+    $('btn-autoplay').classList.remove('active');
+    return;
+  }
+  state.autoplay = true;
+  $('btn-autoplay').classList.add('active');
+  const tick = () => {
+    if (!state.autoplay) return;
+    state.currentSlide = (state.currentSlide + 1) % state.slides.length;
+    renderAll();
+    autoplayTimer = setTimeout(tick, state.timing.slideInterval);
+  };
+  autoplayTimer = setTimeout(tick, state.timing.slideInterval);
+}
+
+// ===== Overlay =====
+function showOverlay(msg) {
+  let overlay = $('overlay');
+  if (!overlay) {
+    overlay = el('div', { class: 'overlay', id: 'overlay' }, [
+      el('div', { class: 'spinner' }),
+      el('div', { class: 'overlay-msg', innerHTML: msg })
+    ]);
+    document.body.appendChild(overlay);
+  } else {
+    overlay.querySelector('.overlay-msg').innerHTML = msg;
+  }
+}
+function hideOverlay() { const o = $('overlay'); if (o) o.remove(); }
+
+// ===== Exports =====
+async function exportPNG() {
+  showOverlay(t('overlay_png'));
+  try {
+    const c = await html2canvas($('canvas'), {
+      width: state.output.w,
+      height: state.output.h,
+      backgroundColor: state.colors.bg,
+      scale: 1,
+      logging: false,
+      useCORS: true
+    });
+    const a = el('a', { href: c.toDataURL('image/png'), download: `kinetic-${Date.now()}.png` });
+    a.click();
+  } catch (e) {
+    alert('PNG 저장 실패: ' + e.message);
+  }
+  hideOverlay();
+}
+
+// 녹화용 슬라이드 1개 재생 시간:
+//   행 딜레이 × 행 수 + 체류시간 + 슬라이드 간격
+function computeSlideDuration(slide) {
+  return state.timing.rowDelay * slide.rows.length
+       + state.timing.dwellTime
+       + state.timing.slideInterval;
+}
+// 전체 녹화 시간 (말미 2초 버퍼 포함) — 진행률 표시용
+function computeTotalDuration() {
+  const sum = state.slides.reduce((s, sl) => s + computeSlideDuration(sl), 0);
+  return sum + 2000;
+}
+
+// ===== Canvas-native 프레임 렌더러 (녹화 전용) =====
+// 미리보기는 기존 CSS @keyframes 그대로,
+// 녹화는 매 프레임을 ctx.fillText 로 직접 그려 captureStream에 흘림.
+// → html2canvas 없음. 60fps 안정 캡처.
+
+const REC_CHAR_SIZES   = { XL: 140, LG: 90, MD: 56, SM: 36 };
+const REC_LINE_HEIGHT  = 1.05;
+
+// CSS animation-timing-function: cubic-bezier(0.2, 0.9, 0.3, 1.1) 매칭
+function makeCubicBezier(p1x, p1y, p2x, p2y) {
+  const f = (a, b, t) => 3*(1-t)*(1-t)*t*a + 3*(1-t)*t*t*b + t*t*t;
+  return (x) => {
+    if (x <= 0) return 0;
+    if (x >= 1) return 1;
+    let t = x;
+    for (let i = 0; i < 10; i++) {
+      const dx = f(p1x, p2x, t) - x;
+      if (Math.abs(dx) < 1e-5) break;
+      const slope = 3*(1-t)*(1-t)*p1x + 6*(1-t)*t*(p2x-p1x) + 3*t*t*(1-p2x);
+      if (slope === 0) break;
+      t = Math.max(0, Math.min(1, t - dx / slope));
+    }
+    return f(p1y, p2y, t);
+  };
+}
+const REC_EASE = makeCubicBezier(0.2, 0.9, 0.3, 1.1);
+const clamp01 = v => Math.max(0, Math.min(1, v));
+
+// preset 별 변환 상태 (CSS @keyframes 1:1 매칭)
+function presetState(preset, raw) {
+  const t = clamp01(raw);
+  const e = REC_EASE(t);
+  switch (preset) {
+    case 'rise-up':    return { opacity:e, tx:0, ty: 80*(1-e), s:1, rot:0, blur:0 };
+    case 'drop-in':    return { opacity:e, tx:0, ty:-80*(1-e), s:1, rot:0, blur:0 };
+    case 'scale-pop': {
+      if (t < 0.6) {
+        const lt = REC_EASE(t/0.6);
+        return { opacity:lt, tx:0, ty:0, s: 0.2+(1.18-0.2)*lt, rot:0, blur:0 };
+      } else {
+        const lt = REC_EASE((t-0.6)/0.4);
+        return { opacity:1, tx:0, ty:0, s: 1.18+(1-1.18)*lt, rot:0, blur:0 };
+      }
+    }
+    case 'slide-left': return { opacity:e, tx: 100*(1-e), ty:0, s:1, rot:0, blur:0 };
+    case 'blur-in':    return { opacity:e, tx:0, ty:0, s:1, rot:0, blur: 24*(1-e) };
+    case 'rotate':     return { opacity:e, tx:0, ty:0, s: 0.3+0.7*e, rot: -Math.PI*(1-e), blur:0 };
+  }
+  return { opacity:1, tx:0, ty:0, s:1, rot:0, blur:0 };
+}
+
+// 한 슬라이드를 t(ms) 시점에 캔버스로 그림
+function drawSlideFrame(ctx, w, h, slide, t) {
+  ctx.save();
+  ctx.fillStyle = state.colors.bg;
+  ctx.fillRect(0, 0, w, h);
+  ctx.restore();
+
+  const ls   = state.timing.letterSpacing;
+  const rs   = state.timing.rowSpacing;
+  const font = state.font;
+
+  // row metric 사전 계산
+  const rows = slide.rows.map(row => {
+    const chars = [...transformQuotes(row.text || '')];
+    const size  = REC_CHAR_SIZES[row.size] || REC_CHAR_SIZES.MD;
+    ctx.save();
+    ctx.font = `900 ${size}px ${font}`;
+    const widths = chars.map(ch => ctx.measureText(ch).width);
+    ctx.restore();
+    const rowW = widths.reduce((s, x, i) => s + x + (i > 0 ? ls : 0), 0);
+    return { chars, widths, rowW, size, color: resolveColor(row.color), lineH: size * REC_LINE_HEIGHT };
+  });
+
+  const totalH = rows.reduce((s, r, i) => s + r.lineH + (i > 0 ? rs : 0), 0);
+  let curY = (h - totalH) / 2;
+
+  let cIdx = 0; // 전역 char index (CSS 렌더와 동일한 stagger)
+  rows.forEach((rd, rowIdx) => {
+    const cy = curY + rd.lineH / 2;
+    let x = (w - rd.rowW) / 2;
+
+    rd.chars.forEach((ch, j) => {
+      const delay = rowIdx * state.timing.rowDelay + cIdx * (state.timing.rowDelay / 4);
+      const raw = state.timing.transitionSpeed > 0
+        ? (t - delay) / state.timing.transitionSpeed
+        : (t >= delay ? 1 : 0);
+      const ps = presetState(slide.preset, raw);
+      const cw = rd.widths[j];
+      const cx = x + cw / 2;
+
+      ctx.save();
+      ctx.globalAlpha = ps.opacity;
+      ctx.translate(cx + ps.tx, cy + ps.ty);
+      if (ps.rot) ctx.rotate(ps.rot);
+      if (ps.s !== 1) ctx.scale(ps.s, ps.s);
+      ctx.font = `900 ${rd.size}px ${font}`;
+      ctx.fillStyle = rd.color;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      if (ps.blur > 0) ctx.filter = `blur(${ps.blur}px)`;
+      ctx.fillText(ch, 0, 0);
+      ctx.restore();
+
+      x += cw + ls;
+      cIdx++;
+    });
+
+    curY += rd.lineH + (rowIdx < rows.length - 1 ? rs : 0);
+  });
+}
+
+// ===== 녹화 본체 =====
+async function captureVideoBlob(preferredMimes, onProgress) {
+  const mimeType = preferredMimes.find(m => MediaRecorder.isTypeSupported(m)) || '';
+  const w = state.output.w, h = state.output.h;
+
+  const recCanvas = document.createElement('canvas');
+  recCanvas.width = w;
+  recCanvas.height = h;
+  const ctx = recCanvas.getContext('2d');
+
+  // 폰트 로딩 보장 — 첫 글자가 fallback으로 잘못 그려지는 것 방지
+  try { await document.fonts.ready; } catch (e) {}
+
+  const stream = recCanvas.captureStream(30);
+  const opts = { videoBitsPerSecond: 5_000_000 };
+  if (mimeType) opts.mimeType = mimeType;
+  const recorder = new MediaRecorder(stream, opts);
+  const chunks = [];
+  recorder.ondataavailable = e => e.data.size && chunks.push(e.data);
+
+  const wasAutoplay = state.autoplay;
+  if (wasAutoplay) toggleAutoplay();
+  const originalSlide = state.currentSlide;
+
+  // 타임라인
+  const slideDurs   = state.slides.map(computeSlideDuration);
+  const slideStarts = [];
+  let acc = 0;
+  for (let i = 0; i < state.slides.length; i++) { slideStarts.push(acc); acc += slideDurs[i]; }
+  const playDur  = acc;
+  const totalDur = playDur + 2000;
+
+  // CSS 미리보기도 같은 타임라인으로 진행 (사용자 시각 피드백)
+  state.currentSlide = 0;
+  renderPreview();
+  onProgress?.(1, state.slides.length);
+  const slideTimers = [];
+  for (let i = 1; i < state.slides.length; i++) {
+    const idx = i;
+    slideTimers.push(setTimeout(() => {
+      state.currentSlide = idx;
+      renderPreview();
+      onProgress?.(idx + 1, state.slides.length);
+    }, slideStarts[idx]));
+  }
+  const finishMsgTimer = setTimeout(() => {
+    const overlay = $('overlay');
+    if (overlay) overlay.querySelector('.overlay-msg').innerHTML = t('overlay_finishing');
+  }, playDur);
+
+  // 첫 프레임 그려두고 captureStream이 잡을 시간 확보
+  drawSlideFrame(ctx, w, h, state.slides[0], 0);
+  await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+  // 녹화 시작 — 같은 tick에서 rAF 루프도 시작
+  recorder.start();
+  const t0 = performance.now();
+  let frameCount = 0;
+
+  await new Promise(resolve => {
+    function tick() {
+      const elapsed = performance.now() - t0;
+      if (elapsed >= totalDur) { resolve(); return; }
+
+      // 현재 시점의 슬라이드 인덱스
+      let slideIdx = state.slides.length - 1;
+      for (let i = 0; i < state.slides.length; i++) {
+        if (elapsed < slideStarts[i] + slideDurs[i]) { slideIdx = i; break; }
+      }
+      const localT = elapsed - slideStarts[slideIdx];
+
+      drawSlideFrame(ctx, w, h, state.slides[slideIdx], localT);
+      frameCount++;
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  });
+
+  recorder.stop();
+  await new Promise(r => recorder.onstop = r);
+  slideTimers.forEach(clearTimeout);
+  clearTimeout(finishMsgTimer);
+  state.currentSlide = originalSlide;
+  renderAll();
+
+  const actualType = recorder.mimeType || mimeType || 'video/webm';
+  console.log(`[녹화] mime=${actualType}, 길이=${((performance.now() - t0) / 1000).toFixed(1)}s, 프레임=${frameCount}, 청크=${chunks.length}`);
+  return { blob: new Blob(chunks, { type: actualType }), mimeType: actualType };
+}
+
+const WEBM_MIMES = ['video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm'];
+const MP4_MIMES  = ['video/mp4', 'video/webm;codecs=h264', 'video/webm'];
+
+async function recordWebM() {
+  const btn = $('btn-record-webm');
+  const originalLabel = btn.innerHTML;
+  btn.disabled = true;
+  try {
+    btn.innerHTML = '● 녹화 중...';
+    showOverlay(`${t('overlay_recording')} 0 / ${state.slides.length}`);
+    const { blob } = await captureVideoBlob(WEBM_MIMES, (i, n) => {
+      $('overlay').querySelector('.overlay-msg').innerHTML = `${t('overlay_recording')} ${i} / ${n}`;
+    });
+    const a = el('a', { href: URL.createObjectURL(blob), download: `kinetic-${Date.now()}.webm` });
+    a.click();
+  } catch (e) {
+    alert('WebM 녹화 실패: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = originalLabel;
+    hideOverlay();
+  }
+}
+
+// MediaRecorder 네이티브 MP4 우선, 미지원 시 자동으로 WebM(h264 → 일반) fallback
+async function recordMP4() {
+  const btn = $('btn-record-mp4');
+  const originalLabel = btn.innerHTML;
+  btn.disabled = true;
+  try {
+    btn.innerHTML = '● 녹화 중...';
+    showOverlay(`${t('overlay_recording')} 0 / ${state.slides.length}`);
+    const { blob, mimeType } = await captureVideoBlob(MP4_MIMES, (i, n) => {
+      $('overlay').querySelector('.overlay-msg').innerHTML = `${t('overlay_recording')} ${i} / ${n}`;
+    });
+    const isMp4 = mimeType.startsWith('video/mp4');
+    const ext = isMp4 ? 'mp4' : 'webm';
+    const a = el('a', {
+      href: URL.createObjectURL(blob),
+      download: `kinetic-${Date.now()}.${ext}`
+    });
+    a.click();
+    if (!isMp4) {
+      setTimeout(() => alert(
+        '이 브라우저는 MP4 네이티브 녹화를 지원하지 않아 .webm 으로 저장됐습니다.\n' +
+        '(Chrome/Edge 최신 버전에서 video/mp4 지원)'
+      ), 50);
+    }
+  } catch (e) {
+    alert('MP4 저장 실패: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = originalLabel;
+    hideOverlay();
+  }
+}
+
+function saveJSON() {
+  const data = {
+    version: 2,
+    slides: state.slides,
+    timing: state.timing,
+    font: state.font,
+    fonts: state.fonts,
+    quoteStyle: state.quoteStyle,
+    palette: state.palette,
+    colors: state.colors,
+    output: state.output,
+    lang: state.lang
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = el('a', { href: URL.createObjectURL(blob), download: `kinetic-${Date.now()}.json` });
+  a.click();
+}
+
+function loadJSON() { $('json-input').click(); }
+
+async function handleJSONInput(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  try {
+    const data = JSON.parse(await file.text());
+    if (data.slides) state.slides = data.slides;
+    if (data.timing) state.timing = { ...state.timing, ...data.timing };
+    if (data.font) state.font = data.font;
+    if (data.fonts) state.fonts = data.fonts;
+    if (data.quoteStyle) state.quoteStyle = data.quoteStyle;
+    if (data.palette) state.palette = data.palette;
+    if (data.colors) state.colors = data.colors;
+    if (data.output) state.output = data.output;
+    if (data.lang && I18N[data.lang]) state.lang = data.lang;
+    state.currentSlide = 0;
+    syncControlsFromState();
+    applyTranslations();
+    renderAll();
+  } catch (err) {
+    alert('JSON 불러오기 실패: ' + err.message);
+  }
+  e.target.value = '';
+}
+
+function syncControlsFromState() {
+  $('color-text').value = state.colors.text;
+  $('color-accent').value = state.colors.accent;
+  $('color-bg').value = state.colors.bg;
+  $('quote-style').value = state.quoteStyle;
+  $('palette-input').value = state.palette.join(', ');
+  if (!state.fonts.some(x => x.family === state.font)) {
+    state.fonts.push({ label: state.font, family: state.font });
+  }
+  renderFontSelect();
+  renderPalette();
+  $('output-size').value = OUTPUT_KEY(state.output);
+}
+
+function exportHTML() {
+  const slidesData = JSON.stringify(state.slides);
+  const timingData = JSON.stringify(state.timing);
+  const colorsData = JSON.stringify(state.colors);
+  const outputData = JSON.stringify(state.output);
+
+  const html = `<!DOCTYPE html>
+<html lang="ko"><head>
+<meta charset="UTF-8">
+<title>Kinetic Export</title>
+${FONT_CDN_LINKS}
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { font-family: ${state.font}; background: ${state.colors.bg}; color: ${state.colors.text}; height: 100vh; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+.wrap { transform-origin: center; }
+.canvas { width: ${state.output.w}px; height: ${state.output.h}px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: ${state.timing.rowSpacing}px; letter-spacing: ${state.timing.letterSpacing}px; padding: 8%; background: ${state.colors.bg}; }
+.canvas-row { display: flex; justify-content: center; flex-wrap: wrap; line-height: 1.05; font-weight: 900; word-break: keep-all; text-align: center; }
+.canvas-row.size-XL { font-size: 140px; } .canvas-row.size-LG { font-size: 90px; } .canvas-row.size-MD { font-size: 56px; } .canvas-row.size-SM { font-size: 36px; }
+.char { display: inline-block; opacity: 0; animation-fill-mode: forwards; animation-timing-function: cubic-bezier(0.2, 0.9, 0.3, 1.1); }
+@keyframes anim-rise-up { from { opacity:0; transform: translateY(80px); } to { opacity:1; transform: translateY(0); } }
+@keyframes anim-drop-in { from { opacity:0; transform: translateY(-80px); } to { opacity:1; transform: translateY(0); } }
+@keyframes anim-scale-pop { 0% { opacity:0; transform: scale(0.2); } 60% { opacity:1; transform: scale(1.18); } 100% { opacity:1; transform: scale(1); } }
+@keyframes anim-slide-left { from { opacity:0; transform: translateX(100px); } to { opacity:1; transform: translateX(0); } }
+@keyframes anim-blur-in { from { opacity:0; filter: blur(24px); } to { opacity:1; filter: blur(0); } }
+@keyframes anim-rotate { from { opacity:0; transform: rotate(-180deg) scale(0.3); } to { opacity:1; transform: rotate(0) scale(1); } }
+.preset-rise-up .char { animation-name: anim-rise-up; }
+.preset-drop-in .char { animation-name: anim-drop-in; }
+.preset-scale-pop .char { animation-name: anim-scale-pop; }
+.preset-slide-left .char { animation-name: anim-slide-left; }
+.preset-blur-in .char { animation-name: anim-blur-in; }
+.preset-rotate .char { animation-name: anim-rotate; }
+</style></head>
+<body>
+<div class="wrap" id="wrap"><div class="canvas" id="canvas"></div></div>
+<script>
+const slides = ${slidesData};
+const timing = ${timingData};
+const colors = ${colorsData};
+const output = ${outputData};
+const quoteStyle = ${JSON.stringify(state.quoteStyle)};
+function transformQuotes(t) {
+  if (!t) return t;
+  if (quoteStyle === 'none') return t.replace(/["\\u201C\\u201D\\u300A\\u300B]/g, '');
+  if (quoteStyle === 'straight') return t.replace(/[\\u201C\\u201D\\u300A\\u300B]/g, '"');
+  const [o, c] = quoteStyle === 'angle' ? ['\\u300A', '\\u300B'] : ['\\u201C', '\\u201D'];
+  const n = t.replace(/[\\u201C\\u201D\\u300A\\u300B]/g, '"');
+  return n
+    .replace(/(\\s|^)"(\\S)/g, '$1' + o + '$2')
+    .replace(/(\\S)"(\\s|$)/g, '$1' + c + '$2')
+    .replace(/(\\S)"$/g,       '$1' + c)
+    .replace(/^"(\\S)/g,       o + '$1');
+}
+let cur = 0;
+function fit() { const s = Math.min(innerWidth / output.w, innerHeight / output.h); document.getElementById('wrap').style.transform = 'scale(' + s + ')'; }
+function show(i) {
+  const slide = slides[i];
+  const c = document.getElementById('canvas');
+  c.className = 'canvas preset-' + slide.preset;
+  c.innerHTML = '';
+  let ci = 0;
+  slide.rows.forEach((row, ri) => {
+    const r = document.createElement('div');
+    r.className = 'canvas-row size-' + row.size;
+    r.style.color = row.color === 'text' ? colors.text : row.color === 'accent' ? colors.accent : row.color;
+    [...transformQuotes(row.text || '')].forEach(ch => {
+      const sp = document.createElement('span');
+      sp.className = 'char';
+      sp.innerHTML = ch === ' ' ? '&nbsp;' : ch;
+      sp.style.animationDelay = (ri * timing.rowDelay + ci * (timing.rowDelay / 4)) + 'ms';
+      sp.style.animationDuration = timing.transitionSpeed + 'ms';
+      r.appendChild(sp);
+      ci++;
+    });
+    c.appendChild(r);
+  });
+}
+show(0); fit();
+addEventListener('resize', fit);
+setInterval(() => { cur = (cur + 1) % slides.length; show(cur); }, timing.slideInterval);
+<\/script>
+</body></html>`;
+
+  const blob = new Blob([html], { type: 'text/html' });
+  const a = el('a', { href: URL.createObjectURL(blob), download: `kinetic-${Date.now()}.html` });
+  a.click();
+}
+
+// ===== Fonts =====
+async function loadLocalFonts() {
+  if (!window.queryLocalFonts) {
+    alert('이 브라우저는 Local Font Access API를 지원하지 않습니다.\n(Chrome 103+ 권장)');
+    return;
+  }
+  try {
+    const fonts = await window.queryLocalFonts();
+    const families = [...new Set(fonts.map(f => f.family))].sort();
+    let added = 0;
+    families.forEach(f => {
+      if (!state.fonts.some(x => x.label === f)) {
+        state.fonts.push({ label: f, family: `"${f}", "Noto Sans KR", sans-serif` });
+        added++;
+      }
+    });
+    renderFontSelect();
+    alert(`${families.length}개 폰트 확인 (신규 ${added}개 추가됨)`);
+  } catch (e) {
+    alert('폰트 권한이 거부되었거나 오류가 발생했습니다.');
+  }
+}
+
+async function loadFontFiles(files) {
+  let lastAdded = null;
+  for (const file of files) {
+    if (!/\.(ttf|otf|woff2?)$/i.test(file.name)) continue;
+    const url = URL.createObjectURL(file);
+    const name = file.name.replace(/\.[^.]+$/, '');
+    try {
+      const face = new FontFace(name, `url(${url})`);
+      await face.load();
+      document.fonts.add(face);
+      if (!state.fonts.some(x => x.label === name)) {
+        const f = { label: name, family: `"${name}", "Noto Sans KR", sans-serif` };
+        state.fonts.push(f);
+        lastAdded = f;
+      }
+    } catch (e) { console.warn('Font load failed:', file.name, e); }
+  }
+  renderFontSelect();
+  if (lastAdded) {
+    state.font = lastAdded.family;
+    $('font-select').value = state.font;
+    renderPreview();
+  }
+}
+
+// ===== Setup =====
+function rebuildOutputOptions() {
+  const sel = $('output-size');
+  const prev = sel.value;
+  sel.innerHTML = '';
+  OUTPUT_GROUPS.forEach(group => {
+    const og = el('optgroup', { label: t(group.key) });
+    group.items.forEach(o => {
+      og.appendChild(el('option', {
+        value: OUTPUT_KEY(o),
+        innerHTML: `${t(o.key)}  ${o.spec}`
+      }));
+    });
+    sel.appendChild(og);
+  });
+  sel.value = prev || OUTPUT_KEY(state.output);
+}
+function setupOutputSelect() {
+  rebuildOutputOptions();
+  $('output-size').addEventListener('change', e => {
+    const [w, h] = e.target.value.split('x').map(Number);
+    state.output = { w, h };
+    renderPreview();
+  });
+}
+
+function setupColors() {
+  $('color-text').addEventListener('input', e => { state.colors.text = e.target.value; renderPreview(); renderRowEditor(); renderPalette(); });
+  $('color-accent').addEventListener('input', e => { state.colors.accent = e.target.value; renderPreview(); renderRowEditor(); renderPalette(); });
+  $('color-bg').addEventListener('input', e => { state.colors.bg = e.target.value; renderPreview(); });
+}
+
+function setupTiming() {
+  const update = (key) => e => {
+    state.timing[key] = +e.target.value;
+    renderTimingValues();
+    if (['rowDelay', 'transitionSpeed', 'rowSpacing', 'letterSpacing'].includes(key)) renderPreview();
+  };
+  $('row-delay').addEventListener('input', update('rowDelay'));
+  $('row-spacing').addEventListener('input', update('rowSpacing'));
+  $('letter-spacing').addEventListener('input', update('letterSpacing'));
+  $('dwell-time').addEventListener('input', update('dwellTime'));
+  $('trans-speed').addEventListener('input', update('transitionSpeed'));
+  $('slide-interval').addEventListener('input', update('slideInterval'));
+}
+
+function setupQuoteStyle() {
+  const sel = $('quote-style');
+  sel.value = state.quoteStyle;
+  sel.addEventListener('change', e => {
+    state.quoteStyle = e.target.value;
+    renderPreview();
+  });
+}
+
+function setupPalette() {
+  $('palette-input').value = state.palette.join(', ');
+  $('palette-input').addEventListener('input', e => {
+    const p = parsePalette(e.target.value);
+    if (p.length > 0) {
+      state.palette = p;
+      renderPalette();
+    }
+  });
+  document.querySelectorAll('.palette-target-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.paletteTarget = btn.dataset.target;
+      document.querySelectorAll('.palette-target-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderPalette();
+    });
+  });
+}
+
+function setupFonts() {
+  const drop = $('font-drop');
+  drop.addEventListener('click', () => $('font-input').click());
+  drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('dragging'); });
+  drop.addEventListener('dragleave', () => drop.classList.remove('dragging'));
+  drop.addEventListener('drop', e => {
+    e.preventDefault();
+    drop.classList.remove('dragging');
+    loadFontFiles(e.dataTransfer.files);
+  });
+  $('font-input').addEventListener('change', e => { loadFontFiles(e.target.files); e.target.value = ''; });
+  $('font-select').addEventListener('change', e => { state.font = e.target.value; renderPreview(); });
+  $('btn-local-fonts').addEventListener('click', loadLocalFonts);
+}
+
+function setupHeader() {
+  $('btn-export-png').addEventListener('click', exportPNG);
+  $('btn-record-webm').addEventListener('click', recordWebM);
+  $('btn-record-mp4').addEventListener('click', recordMP4);
+  $('btn-save-json').addEventListener('click', saveJSON);
+  $('btn-load-json').addEventListener('click', loadJSON);
+  $('btn-export-html').addEventListener('click', exportHTML);
+  $('json-input').addEventListener('change', handleJSONInput);
+  setupHelpModal();
+  setupLangMenu();
+}
+
+// ===== i18n =====
+function applyTranslations() {
+  // textContent 일괄 적용
+  document.querySelectorAll('[data-i18n]').forEach(node => {
+    const key = node.dataset.i18n;
+    const v = (I18N[state.lang] || {})[key];
+    if (v !== undefined) node.textContent = v;
+  });
+  // title 속성
+  document.querySelectorAll('[data-i18n-title]').forEach(node => {
+    const key = node.dataset.i18nTitle;
+    const v = (I18N[state.lang] || {})[key];
+    if (v !== undefined) node.setAttribute('title', v);
+  });
+  // 동적 부분: 행 placeholder, 슬라이드 (empty), 출력 사이즈 옵션
+  rebuildOutputOptions();
+  renderRowEditor();
+  renderSlideList();
+  renderPalette();
+  // 메뉴 활성 표시
+  document.querySelectorAll('.lang-option').forEach(b => {
+    b.classList.toggle('active', b.dataset.lang === state.lang);
+  });
+  // <html lang> 속성도 동기화 (접근성)
+  document.documentElement.lang = state.lang;
+}
+
+function setLanguage(lang) {
+  if (!I18N[lang]) return;
+  state.lang = lang;
+  // 언어별 기본 폰트로 자동 전환 (사용자가 dropdown으로 명시적 선택했어도 언어 전환 시 override)
+  state.font = LANG_FONTS[lang];
+  $('font-select').value = state.font;
+  applyTranslations();
+  renderPreview();
+}
+
+function setupLangMenu() {
+  const btn = $('btn-lang');
+  const menu = $('lang-menu');
+  btn.addEventListener('click', e => {
+    e.stopPropagation();
+    menu.classList.toggle('open');
+  });
+  document.addEventListener('click', e => {
+    if (menu.classList.contains('open') && !menu.contains(e.target) && e.target !== btn) {
+      menu.classList.remove('open');
+    }
+  });
+  menu.querySelectorAll('.lang-option').forEach(opt => {
+    opt.addEventListener('click', () => {
+      setLanguage(opt.dataset.lang);
+      menu.classList.remove('open');
+    });
+  });
+}
+
+function setupHelpModal() {
+  const modal = $('help-modal');
+  const open = () => { modal.classList.add('open'); modal.setAttribute('aria-hidden', 'false'); };
+  const close = () => { modal.classList.remove('open'); modal.setAttribute('aria-hidden', 'true'); };
+  $('btn-help').addEventListener('click', open);
+  $('help-close').addEventListener('click', close);
+  // 바깥(백드롭) 클릭 → 닫기
+  modal.addEventListener('click', e => { if (e.target === modal) close(); });
+  // ESC → 닫기
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && modal.classList.contains('open')) close();
+  });
+}
+
+function setupActions() {
+  $('add-slide').addEventListener('click', addSlide);
+  $('add-row').addEventListener('click', addRow);
+  $('btn-replay').addEventListener('click', replay);
+  $('btn-autoplay').addEventListener('click', toggleAutoplay);
+}
+
+function init() {
+  setupOutputSelect();
+  setupColors();
+  setupTiming();
+  setupQuoteStyle();
+  setupPalette();
+  setupFonts();
+  setupHeader();
+  setupActions();
+  renderFontSelect();
+  renderPalette();
+  applyTranslations();    // 초기 언어 적용 (state.lang = 'ko')
+  renderAll();
+  window.addEventListener('resize', resizePreview);
+  new ResizeObserver(resizePreview).observe($('preview-stage'));
+}
+
+init();
+</script>
+</body>
+</html>
